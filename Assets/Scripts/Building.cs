@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Building : MonoBehaviour
 {
-    public float latentTorqueRange = 0.00001f;
+    public float latentTorqueRange = 0.0005f;
     private Vector3 torque;
     public int buildingIndex;
 

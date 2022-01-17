@@ -52,7 +52,7 @@ public class OutlineEffect : MonoBehaviour
 	public float fillAmount = 0.2f;
 
 	public Color lineColor0 = Color.red;
-	public Color lineColor1 = Color.green;
+	public Color lineColor1 = Color.yellow;
 	public Color lineColor2 = Color.blue;
 
 	public bool additiveRendering = false;
@@ -354,7 +354,7 @@ public class OutlineEffect : MonoBehaviour
 		if (outlineEraseMaterial == null)
 			outlineEraseMaterial = CreateMaterial(new Color(0, 0, 0, 0));
 		if (outline1Material == null)
-			outline1Material = CreateMaterial(new Color(1, 0, 0, 0));
+			outline1Material = CreateMaterial(new Color(1, 0.92f, 0.016f, 1));
 		if (outline2Material == null)
 			outline2Material = CreateMaterial(new Color(0, 1, 0, 0));
 		if (outline3Material == null)

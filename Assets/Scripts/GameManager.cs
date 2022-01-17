@@ -76,11 +76,6 @@ public class GameManager : MonoBehaviour
         {
             CheckPauseGame();
         }
-
-        if (Input.GetKeyDown("c"))
-        {
-            ClearSelectedBuildings();
-        }
     }
 
     // Game State Functions
@@ -229,22 +224,18 @@ public class GameManager : MonoBehaviour
         return retList;
     }
 
-     private float GetSelectedDistance()
+     public float[] GetSelectedDistance()
      {
-         int firstSel = buildingSelection[0].GetComponent<Building>().GetBuildingIndex();
-         int secondSel = buildingSelection[1].GetComponent<Building>().GetBuildingIndex();
+        // return the array where [0] is distance apart in map space, [1] in latent space
+        // TODO: try/catch when buildingSelection.Count < 2
 
-        float dist;
-        if (LevelManager.S.latentSpace)
-        {
-            dist = Vector3.Distance(buildingLatentCoords[firstSel], buildingLatentCoords[secondSel]);
-        }
-        else
-        {
-            dist = Vector3.Distance(buildingMapCoords[firstSel], buildingMapCoords[secondSel]);
-        }
+        int firstSel = buildingSelection[0].GetComponent<Building>().GetBuildingIndex();
+        int secondSel = buildingSelection[1].GetComponent<Building>().GetBuildingIndex();
 
-        return dist;
+        float mapDist = Vector3.Distance(buildingMapCoords[firstSel], buildingMapCoords[secondSel]);
+        float latentDist = Vector3.Distance(buildingLatentCoords[firstSel], buildingLatentCoords[secondSel]);
+        
+        return new float[] { mapDist, latentDist };
      }
 
     // UI
@@ -268,27 +259,60 @@ public class GameManager : MonoBehaviour
     }
 
     /// Building Selection
+    public List<GameObject> GetBuildingSelection()
+    {
+        return buildingSelection;
+    }
+
+    public bool BuildingIsSelected(GameObject building)
+    {
+        foreach (GameObject selected in buildingSelection)
+        {
+            if (selected.name == building.name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void SelectBuilding(GameObject selectedBuilding)
     {
-        // Currently maximum two selections
-        if (buildingSelection.Count > 1)
+        // Currently maximum 2 selections
+
+        // Check if selected building is already in the list
+        bool alreadySelected = BuildingIsSelected(selectedBuilding);
+
+        foreach (GameObject selected in buildingSelection)
         {
-            buildingSelection[0].GetComponent<Outline>().eraseRenderer = true;
-            buildingSelection.RemoveAt(0);
-            buildingSelection.Add(selectedBuilding);
+            if (selected.name == selectedBuilding.name)
+            {
+                alreadySelected = true;
+            }
         }
-        else
+
+        if (!alreadySelected)
         {
+            // Check if already at 2 selections
+            if (buildingSelection.Count > 1)
+            {
+                buildingSelection[0].GetComponent<Outline>().eraseRenderer = true;
+                buildingSelection[0].GetComponent<Outline>().color = 0;
+                buildingSelection.RemoveAt(0);
+            }
+
             selectedBuilding.GetComponent<Outline>().eraseRenderer = false;
+            selectedBuilding.GetComponent<Outline>().color = 1;
             buildingSelection.Add(selectedBuilding);
         }
     }
 
-    private void ClearSelectedBuildings()
+    public void ClearSelectedBuildings()
     {
         foreach (GameObject building in buildingSelection)
         {
             building.GetComponent<Outline>().eraseRenderer = true;
+            building.GetComponent<Outline>().color = 0;
         }
 
         buildingSelection.Clear();

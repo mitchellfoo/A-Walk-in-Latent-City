@@ -9,6 +9,9 @@ public class Raycast : MonoBehaviour
     public GameObject selectBuildingPrefab;
     private GameObject lastBuilding;
 
+    public string selectKey = "v";
+    public string clearKey = "c";
+
     private void Start()
     {
         audio = GetComponent<AudioSource>();
@@ -37,15 +40,21 @@ public class Raycast : MonoBehaviour
             DetermineViewClick(ray);
         }
 
-        // Add to selection
-        if (Input.GetKeyDown("r"))
+        // Add/Remove building selection
+        if (Input.GetKeyDown(selectKey))
         {
             DetermineViewSelect(ray);
+        }
+        if (Input.GetKeyDown(clearKey))
+        {
+            GameManager.S.ClearSelectedBuildings();
         }
     }
 
     private void DetectBuildingView(Ray view)
     {
+        // Turn on the outline if building is in the player's crosshair
+        // TODO: Clean up repeated code
         RaycastHit hit;
         if (Physics.Raycast(view, out hit))
         {
@@ -57,7 +66,10 @@ public class Raycast : MonoBehaviour
                 // Highlight building
                 if (lastBuilding != null)
                 {
-                    lastBuilding.GetComponent<Outline>().eraseRenderer = true;
+                    if (!GameManager.S.BuildingIsSelected(lastBuilding))
+                    {
+                        lastBuilding.GetComponent<Outline>().eraseRenderer = true;
+                    }
                 }
                 lastBuilding = hit.transform.gameObject;
                 lastBuilding.GetComponent<Outline>().eraseRenderer = false;
@@ -67,7 +79,10 @@ public class Raycast : MonoBehaviour
                 selectBuildingPrefab.SetActive(false);
                 if (lastBuilding != null)
                 {
-                    lastBuilding.GetComponent<Outline>().eraseRenderer = true;
+                    if (!GameManager.S.BuildingIsSelected(lastBuilding))
+                    {
+                        lastBuilding.GetComponent<Outline>().eraseRenderer = true;
+                    }
                 }
             }
         }
@@ -76,7 +91,10 @@ public class Raycast : MonoBehaviour
             selectBuildingPrefab.SetActive(false);
             if (lastBuilding != null)
             {
-                lastBuilding.GetComponent<Outline>().eraseRenderer = true;
+                if (!GameManager.S.BuildingIsSelected(lastBuilding))
+                {
+                    lastBuilding.GetComponent<Outline>().eraseRenderer = true;
+                }
             }
         }
     }
@@ -89,6 +107,7 @@ public class Raycast : MonoBehaviour
             if (hit.transform.tag == "Building")
             {
                 GameManager.S.SetCurrBuilding(hit.transform.gameObject.GetComponent<Building>().GetBuildingIndex());
+                GameManager.S.ClearSelectedBuildings(); // Temporary solution; in future update selection will carry over
                 LevelManager.S.ChangeScene();
             }
         }

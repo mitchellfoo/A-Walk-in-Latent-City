@@ -49,7 +49,7 @@ public class BuildingBuilder : MonoBehaviour
             mesh.gameObject.tag = "Building";
             mesh.gameObject.layer = LayerMask.NameToLayer("Building");
 
-            // If latent set rotation and scale
+            // If latent set rotation, scale, turn off collision
             Bounds meshBounds = mesh.GetComponent<MeshFilter>().mesh.bounds;
             if (LevelManager.S.latentSpace)
             {
@@ -72,6 +72,7 @@ public class BuildingBuilder : MonoBehaviour
                     maxFoot = boundsZ;
                 }
 
+                maxFoot /= 10;
                 float scaleAdj = latentScale / maxFoot;
 
                 // Set scale
@@ -80,9 +81,13 @@ public class BuildingBuilder : MonoBehaviour
             else
             {
                 // Adjust Y in map view
+                // TODO: Adjust code to actually work
                 float yAdj = meshBounds.center.y - meshBounds.min.y/2;
                 mesh.transform.position = new Vector3(mesh.transform.position.x, yAdj, mesh.transform.position.z);
             }
+
+            // Colors based on latent codes
+            // TODO
 
             // Set position
             //Debug.Log(indexCount);

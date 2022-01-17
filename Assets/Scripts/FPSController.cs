@@ -31,10 +31,11 @@ public class FPSController : MonoBehaviour
     public TextMeshProUGUI bCodeOverlay;
 
     // Selection Panel
+    public GameObject bSelectionPanel;
     public TextMeshProUGUI b1Name;
     public TextMeshProUGUI b2Name;
     public TextMeshProUGUI geoDistance;
-    public TextMeshProUGUI latentName;
+    public TextMeshProUGUI latentDistance;
 
     [Header("Additional Variables")]
     public float latentPosShift = 3.0f;
@@ -76,13 +77,18 @@ public class FPSController : MonoBehaviour
             characterController.enabled = true;
         }
 
-        // Latent space adjustments
+        // Player-building physics
+        int layerBuilding = LayerMask.NameToLayer("Building");
+        int layerPlayer = LayerMask.NameToLayer("Player");
         if (LevelManager.S.latentSpace)
         {
-            // Turn off capsule collision
-            playerCapsule.GetComponent<CapsuleCollider>().enabled = false;
-
+            Physics.IgnoreLayerCollision(layerBuilding, layerPlayer, true);
+            Debug.Log(Physics.GetIgnoreLayerCollision(layerBuilding, layerPlayer));
             gravity = 0f;
+        }
+        else
+        {
+            Physics.IgnoreLayerCollision(layerBuilding, layerPlayer, false);
         }
     }
 
@@ -128,13 +134,14 @@ public class FPSController : MonoBehaviour
         }
 
         // Update HUD text
-        //f = Mathf.Round(f * 10.0f) * 0.1f;
+        /// Rounded to 1 decimal place
         float posX = Mathf.Round(transform.position.x * 10.0f) * 0.1f;
         float posY = Mathf.Round(transform.position.z * 10.0f) * 0.1f; ;
         float posZ = Mathf.Round(transform.position.y * 10.0f) * 0.1f; ;
 
         positionOverlay.text = "X:" + posX + ", Y:" + posY + ", Z:" + posZ;
 
+        /// TODO: take these out of update and only called when button pressed
         BuildingInfoPanel();
         BuildingSelectionPanel();
     }
@@ -183,6 +190,24 @@ public class FPSController : MonoBehaviour
 
     private void BuildingSelectionPanel()
     {
-        // TODO
+        List<GameObject> selectedBuildings = GameManager.S.GetBuildingSelection();
+        if (selectedBuildings.Count == 2)
+        {
+            bSelectionPanel.SetActive(true);
+            // need building gameObjects
+            // need distance values
+            b1Name.text = selectedBuildings[0].gameObject.name;
+            b2Name.text = selectedBuildings[1].gameObject.name;
+
+            float[] distances = GameManager.S.GetSelectedDistance();
+            float geoVal = Mathf.Round(distances[0] * 10.0f) * 0.1f;
+            float latentVal = Mathf.Round(distances[1] * 10.0f) * 0.1f;
+            geoDistance.text = "" + geoVal;
+            latentDistance.text = "" + latentVal;
+        }
+        else
+        {
+            bSelectionPanel.SetActive(false);
+        }
     }
 }
