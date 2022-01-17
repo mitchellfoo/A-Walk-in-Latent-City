@@ -1,4 +1,4 @@
-# A-Walk-in-Latent-City
+# A Walk in Latent-City
 
 A Unity project interfacing with a VAE trained on Montreal building geometry.
 
