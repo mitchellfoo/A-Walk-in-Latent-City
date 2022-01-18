@@ -109,24 +109,4 @@ public class BuildingBuilder : MonoBehaviour
             built.transform.position = GameManager.S.buildingMapCoords[i];
         }
     }
-
-    /*
-    private void SetBuildingPos()
-    {
-        for (int i = 0; i < buildings.Length; i++)
-        {
-            GameObject built = transform.GetChild(i).gameObject;
-
-            if (LevelManager.S.latentSpace)
-            {
-                built.transform.position = GameManager.S.buildingLatentCoords[i];
-            }
-            else
-            {
-                built.transform.position = GameManager.S.buildingMapCoords[i];
-                Debug.Log(i);
-            }
-        }
-    }
-    */
 }
