@@ -38,5 +38,4 @@ public class Building : MonoBehaviour
     {
         buildingIndex = i;
     }
-
 }

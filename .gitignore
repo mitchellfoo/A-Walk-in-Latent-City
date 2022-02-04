@@ -2,14 +2,14 @@
 /*
 
 #Except the Assets and ProjectSettings folder, as well as the selected Git files.
-!Assets/Materials
-!Assets/OBJs
-!Assets/OutlineEffect
-!Assets/Prefabs
+!Assets/Materials/
+!Assets/OBJs/
+!Assets/OutlineEffect/
+!Assets/Prefabs/
 !Assets/Scenes
-!Assets/Scripts
-!Assets/TextMesh Pro
-!Assets/UI
+!Assets/Scripts/
+!Assets/TextMesh Pro/
+!Assets/UI/
 !ProjectSettings/
 !.gitignore
 !.gitattributes
