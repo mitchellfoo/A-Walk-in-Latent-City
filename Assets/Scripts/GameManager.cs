@@ -242,9 +242,10 @@ public class GameManager : MonoBehaviour
 
     // Getter Setter Functions
     /// Current building
+
     public GameObject GetCurrBuilding()
     {
-        return currentBuilding;
+        return bBComp.buildings[currentBuildingIndex];
     }
 
     public int GetCurrBuildingIndex()

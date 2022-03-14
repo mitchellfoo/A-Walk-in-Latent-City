@@ -788,6 +788,30 @@ PrefabInstance:
       propertyPath: m_ClearFlags
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 183046690976522994, guid: 450170a1b528d2644a811acb582c78f1, type: 3}
+      propertyPath: m_OcclusionCulling
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 183046690976522994, guid: 450170a1b528d2644a811acb582c78f1, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.41865435
+      objectReference: {fileID: 0}
+    - target: {fileID: 183046690976522994, guid: 450170a1b528d2644a811acb582c78f1, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.4381184
+      objectReference: {fileID: 0}
+    - target: {fileID: 183046690976522994, guid: 450170a1b528d2644a811acb582c78f1, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.6037736
+      objectReference: {fileID: 0}
+    - target: {fileID: 183046690976522994, guid: 450170a1b528d2644a811acb582c78f1, type: 3}
+      propertyPath: m_AllowDynamicResolution
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1981714153400742516, guid: 450170a1b528d2644a811acb582c78f1, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 450170a1b528d2644a811acb582c78f1, type: 3}
 --- !u!1 &183046690853244802 stripped

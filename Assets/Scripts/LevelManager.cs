@@ -33,6 +33,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    // Scene Management
     public void ChangeScene()
     {
         SceneManager.LoadScene(nextScene);
@@ -49,5 +50,4 @@ public class LevelManager : MonoBehaviour
         Destroy(GameManager.S.gameObject);
         SceneManager.LoadScene("TitleScene");
     }
-
 }

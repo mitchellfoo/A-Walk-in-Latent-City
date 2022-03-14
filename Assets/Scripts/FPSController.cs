@@ -17,13 +17,27 @@ public class FPSController : MonoBehaviour
     public float runningSpeed = 11.5f;
     public float jumpSpeed = 8.0f;
     public float gravity = 20.0f;
-    public Camera playerCamera;
+
     public float lookSpeed = 2.0f;
     public float lookXLimit = 45.0f;
+    public string flyKey = "f";
+    public string upKey = "e";
+    public string downKey = "q";
+    public string viewKey = "x";
+
+    private bool canFly = false;
+    private Vector3 pos;
+
+    [Header("Cameras")]
+    public Camera playerCamera;
+    public Camera buildingCamera;
+
+    private bool onBuildCam = false;
 
     [Header("GUI Objects")]
     // Info Panel
     public TextMeshProUGUI positionOverlay;
+    public GameObject flyModeOverlay;
     public GameObject bInfoPanel;
     public TextMeshProUGUI bNameOverlay;
     public TextMeshProUGUI bMapOverlay;
@@ -38,8 +52,9 @@ public class FPSController : MonoBehaviour
     public TextMeshProUGUI latentDistance;
 
     [Header("Additional Variables")]
-    public float latentPosShift = 3.0f;
+    public float latentPosShift = 2.0f;
     public GameObject playerCapsule;
+    public GameObject teleportMarker;
 
     CharacterController characterController;
     Vector3 moveDirection = Vector3.zero;
@@ -60,10 +75,13 @@ public class FPSController : MonoBehaviour
         if (GameManager.S.GetCurrBuildingIndex() != -1)
         {
             // Determine latent or map
-            Vector3 pos;
             if (LevelManager.S.latentSpace)
             {
                 pos = GameManager.S.buildingLatentCoords[GameManager.S.GetCurrBuildingIndex()];
+                
+                // Marker
+                GameObject marker = Instantiate(teleportMarker);
+                marker.transform.localPosition = pos + Vector3.up;
             }
             else
             {
@@ -74,7 +92,15 @@ public class FPSController : MonoBehaviour
             characterController.enabled = false;
             PlayerStartPos(pos);
             InitPlayerLook();
+            SwitchCameras();
             characterController.enabled = true;
+        }
+
+        // Set fly in latent space
+        if (LevelManager.S.latentSpace)
+        {
+            canFly = true;
+            flyModeOverlay.SetActive(true);
         }
 
         // Player-building physics
@@ -97,6 +123,7 @@ public class FPSController : MonoBehaviour
         // We are grounded, so recalculate move direction based on axes
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
+
         // Press Left Shift to run
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
         float curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Vertical") : 0;
@@ -116,16 +143,19 @@ public class FPSController : MonoBehaviour
         // Apply gravity. Gravity is multiplied by deltaTime twice (once here, and once below
         // when the moveDirection is multiplied by deltaTime). This is because gravity should be applied
         // as an acceleration (ms^-2)
-        if (!characterController.isGrounded)
+        if (!characterController.isGrounded && !canFly)
         {
             moveDirection.y -= gravity * Time.deltaTime;
         }
 
-        // Move the controller
-        characterController.Move(moveDirection * Time.deltaTime);
+        // Camera switching
+        if (Input.GetKeyDown(viewKey))
+        {
+            SwitchCameras();
+        }
 
         // Player and Camera rotation
-        if (canMove)
+        if (canMove && !onBuildCam)
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
@@ -133,11 +163,40 @@ public class FPSController : MonoBehaviour
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
 
+        // Check Flying Mode
+        if (!LevelManager.S.latentSpace && Input.GetKeyDown(flyKey))
+        {
+            canFly = !canFly;
+            Debug.Log("Fly Mode: " + canFly);
+            flyModeOverlay.SetActive(!flyModeOverlay.activeSelf);
+        }
+
+        if (canFly)
+        {
+            transform.TransformDirection(Vector3.up);
+            transform.TransformDirection(Vector3.down);
+
+            moveDirection.y = 0;
+
+            if (Input.GetKey(upKey))
+            {
+                moveDirection.y = (isRunning ? runningSpeed : walkingSpeed);
+            }
+
+            if (Input.GetKey(downKey))
+            {
+                moveDirection.y = -(isRunning ? runningSpeed : walkingSpeed);
+            }
+        }
+
+        // Move the controller
+        characterController.Move(moveDirection * Time.deltaTime);
+
         // Update HUD text
         /// Rounded to 1 decimal place
         float posX = Mathf.Round(transform.position.x * 10.0f) * 0.1f;
-        float posY = Mathf.Round(transform.position.z * 10.0f) * 0.1f; ;
-        float posZ = Mathf.Round(transform.position.y * 10.0f) * 0.1f; ;
+        float posY = Mathf.Round(transform.position.z * 10.0f) * 0.1f;
+        float posZ = Mathf.Round(transform.position.y * 10.0f) * 0.1f;
 
         positionOverlay.text = "X:" + posX + ", Y:" + posY + ", Z:" + posZ;
 
@@ -146,17 +205,18 @@ public class FPSController : MonoBehaviour
         BuildingSelectionPanel();
     }
 
+    // Start Position
     private void PlayerStartPos(Vector3 buildingPos)
     {
         Debug.Log(buildingPos);
 
         /// Pseudo randomly place player a little away from building
-        float shiftX = Random.Range(0, 2) * 2 - 1 * latentPosShift;
-        float shiftZ = Random.Range(0, 2) * 2 - 1 * latentPosShift;
+        //float shiftX = Random.Range(0, 2) * 2 - 1 * latentPosShift;
+        //float shiftZ = Random.Range(0, 2) * 2 - 1 * latentPosShift;
 
-        buildingPos.x += shiftX;
+        buildingPos.x += latentPosShift;
         buildingPos.y = 0;
-        buildingPos.z += shiftZ;
+        buildingPos.z += latentPosShift;
         transform.localPosition = buildingPos;
 
         Debug.Log("Player Pos" + transform.localPosition);
@@ -165,8 +225,26 @@ public class FPSController : MonoBehaviour
     private void InitPlayerLook()
     {
         Vector3 buildingPos = GameManager.S.buildingLatentCoords[GameManager.S.GetCurrBuildingIndex()];
-        playerCamera.transform.LookAt(buildingPos);
+        //playerCamera.transform.LookAt(buildingPos);
+
+        Vector3 lookPos = buildingPos - transform.position;
+        lookPos.y = 0;
+        Quaternion rotation = Quaternion.LookRotation(lookPos);
+        transform.rotation = rotation;
+        //transform.LookAt(buildingPos);
     }
+
+    // Camera controls/switching
+    private void SwitchCameras()
+    {
+        Debug.Log("Changing Cameras");
+        onBuildCam = !onBuildCam;
+        playerCamera.enabled = !playerCamera.enabled;
+        playerCamera.transform.GetComponentInParent<Raycast>().enabled = !playerCamera.transform.GetComponentInParent<Raycast>().enabled;
+        buildingCamera.enabled = !buildingCamera.enabled;
+        buildingCamera.GetComponent<BuildingCamera>().MakeActive(pos);
+    }
+
 
     // GUI
     private void BuildingInfoPanel()
