@@ -78,7 +78,9 @@ public class FPSController : MonoBehaviour
             if (LevelManager.S.latentSpace)
             {
                 pos = GameManager.S.buildingLatentCoords[GameManager.S.GetCurrBuildingIndex()];
-                
+
+                SwitchCameras();
+
                 // Marker
                 GameObject marker = Instantiate(teleportMarker);
                 marker.transform.localPosition = pos + Vector3.up;
@@ -92,7 +94,6 @@ public class FPSController : MonoBehaviour
             characterController.enabled = false;
             PlayerStartPos(pos);
             InitPlayerLook();
-            SwitchCameras();
             characterController.enabled = true;
         }
 
@@ -149,7 +150,7 @@ public class FPSController : MonoBehaviour
         }
 
         // Camera switching
-        if (Input.GetKeyDown(viewKey))
+        if (Input.GetKeyDown(viewKey) && LevelManager.S.latentSpace)
         {
             SwitchCameras();
         }
@@ -215,7 +216,7 @@ public class FPSController : MonoBehaviour
         //float shiftZ = Random.Range(0, 2) * 2 - 1 * latentPosShift;
 
         buildingPos.x += latentPosShift;
-        buildingPos.y = 0;
+        //buildingPos.y = 0;
         buildingPos.z += latentPosShift;
         transform.localPosition = buildingPos;
 
@@ -238,6 +239,7 @@ public class FPSController : MonoBehaviour
     private void SwitchCameras()
     {
         Debug.Log("Changing Cameras");
+        canMove = !canMove;
         onBuildCam = !onBuildCam;
         playerCamera.enabled = !playerCamera.enabled;
         playerCamera.transform.GetComponentInParent<Raycast>().enabled = !playerCamera.transform.GetComponentInParent<Raycast>().enabled;

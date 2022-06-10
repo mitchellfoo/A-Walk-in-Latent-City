@@ -1,16 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class BuildingBuilder : MonoBehaviour
 {
     public GameObject[] buildings;
     public float latentScale = 200f;
-    
+    public float latentTranparency = 0.7f;
+
     // Start is called before the first frame update
     void Start()
     {
         LoadBuildings();
+
+        if (!GameManager.S.heightColor)
+        {
+            GameManager.S.heightColor = true;
+            SetHeightColor();
+        }
+
+        SetBuildingColors();
     }
 
     private void LoadBuildings()
@@ -55,7 +65,7 @@ public class BuildingBuilder : MonoBehaviour
             {
                 // Turn of collision
                 //mesh.GetComponent<MeshCollider>().enabled = false;
-                
+
                 // Make mesh spin
                 bComp.ActivateLatentTorque();
 
@@ -82,22 +92,67 @@ public class BuildingBuilder : MonoBehaviour
             {
                 // Adjust Y in map view
                 // TODO: Adjust code to actually work
-                float yAdj = meshBounds.center.y - meshBounds.min.y/2;
+                float yAdj = meshBounds.center.y - meshBounds.min.y / 2;
                 mesh.transform.position = new Vector3(mesh.transform.position.x, yAdj, mesh.transform.position.z);
             }
 
-            // Colors based on latent codes
-            // TODO
-
             // Set position
             //Debug.Log(indexCount);
+            float thirdD = meshBounds.size.y;
+            SetThirdDimension(thirdD, indexCount);
             SetBuildingPos(building, indexCount);
 
-            // Update index
+            // Update Index
             indexCount++;
         }
     }
     
+    private void SetThirdDimension(float height, int i)
+    {
+        Vector3 latentCoord = GameManager.S.buildingLatentCoords[i];
+        latentCoord.y = height;
+        GameManager.S.buildingLatentCoords[i] = latentCoord;
+    }
+
+    private void SetHeightColor()
+    {
+        float yMax = GameManager.S.buildingLatentCoords.Max(v => v.y);
+        float yMin = GameManager.S.buildingLatentCoords.Min(v => v.y);
+
+        int idx = 0;
+        foreach (Vector3 coord in GameManager.S.buildingLatentCoords)
+        {
+            float yNorm = (coord.y - yMin) / (yMax - yMin);
+
+            Color currColor = GameManager.S.buildingColors[idx];
+            currColor.g = yNorm;
+            GameManager.S.buildingColors[idx] = currColor;
+
+            idx++;
+        }
+    }
+
+    private void SetBuildingColors()
+    {
+        // Colors based on latent codes
+
+        int idx = 0;
+        foreach (Transform child in transform)
+        {
+            Color buildingColor = GameManager.S.buildingColors[idx];
+            if (LevelManager.S.latentSpace)
+            {
+                buildingColor.a = latentTranparency;
+            }
+
+            GameObject mesh = child.GetChild(0).gameObject;
+            mesh.GetComponent<Renderer>().material.color = buildingColor;
+
+            // Update index
+            idx++;
+        }
+    }
+
     private void SetBuildingPos(GameObject built, int i)
     {
         if (LevelManager.S.latentSpace)

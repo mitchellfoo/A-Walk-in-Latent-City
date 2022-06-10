@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Text.RegularExpressions;
+using System.Linq;
 using TMPro;
 
 public enum GameState { titleMenu, pauseMenu, guideMenu, creditsMenu, getReady, cityState, latentState }
@@ -44,6 +45,10 @@ public class GameManager : MonoBehaviour
     public List<Vector3> buildingLatentCoords = new List<Vector3>();
     public List<int> buildingLatentCodes = new List<int>();
 
+    [HideInInspector]
+    public bool heightColor = false;
+    public List<Color> buildingColors = new List<Color>();
+
     private void Awake()
     {
         //Singleton def
@@ -67,6 +72,8 @@ public class GameManager : MonoBehaviour
         buildingMapCoords = LoadCoords(mapCoords, true);
         buildingLatentCoords = LoadCoords(latentCoords);
         buildingLatentCodes = LoadCodes(latentCodes);
+
+        buildingColors = LoadColors();
     }
 
     // Update is called once per frame
@@ -221,6 +228,33 @@ public class GameManager : MonoBehaviour
                 retList.Add(val);
             }
         }
+        return retList;
+    }
+    
+    private List<Color> LoadColors()
+    {
+        List<Color> retList = new List<Color>();
+
+        // Get min/max pair per dimension
+        float xMax = buildingLatentCoords.Max(v => v.x);
+        //float yMax = buildingLatentCoords.Max(v => v.y);
+        float zMax = buildingLatentCoords.Max(v => v.z);
+
+        float xMin = buildingLatentCoords.Min(v => v.x);
+        //float yMin = buildingLatentCoords.Min(v => v.y);
+        float zMin = buildingLatentCoords.Min(v => v.z);
+
+        // Per coordinate, normalize and convert to color
+        foreach (Vector3 coord in buildingLatentCoords)
+        {
+            float xNorm = (coord.x - xMin) / (xMax - xMin);
+            //float yNorm = (coord.y - yMin) / (yMax - yMin);
+            float zNorm = (coord.z - zMin) / (zMax - zMin);
+
+            retList.Add(new Color(xNorm, 1.0f, zNorm, 1.0f));
+            //Debug.Log("Color: " + xNorm + ":" + 1.0f + ":" + zNorm);
+        }
+
         return retList;
     }
 
