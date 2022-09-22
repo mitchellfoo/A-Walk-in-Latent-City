@@ -134,7 +134,7 @@ public class BuildingBuilder : MonoBehaviour
 
     private void SetBuildingColors()
     {
-        // Colors based on latent codes
+        // Colors based on latent vector
 
         int idx = 0;
         foreach (Transform child in transform)
