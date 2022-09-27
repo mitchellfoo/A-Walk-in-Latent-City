@@ -51,6 +51,9 @@ public class FPSController : MonoBehaviour
     public TextMeshProUGUI geoDistance;
     public TextMeshProUGUI latentDistance;
 
+    // Building Inspector Panel
+    public GameObject bInspectorPanel;
+
     [Header("Additional Variables")]
     public float latentPosShift = 2.0f;
     public GameObject playerCapsule;
@@ -204,6 +207,15 @@ public class FPSController : MonoBehaviour
         /// TODO: take these out of update and only called when button pressed
         BuildingInfoPanel();
         BuildingSelectionPanel();
+
+        // Check for quit
+        /*
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            Debug.Log("Closing Application");
+            Application.Quit();
+        }
+        */
     }
 
     // Start Position
@@ -238,6 +250,7 @@ public class FPSController : MonoBehaviour
     // Camera controls/switching
     private void SwitchCameras()
     {
+        // Camera Changing
         Debug.Log("Changing Cameras");
         canMove = !canMove;
         onBuildCam = !onBuildCam;
@@ -245,6 +258,9 @@ public class FPSController : MonoBehaviour
         playerCamera.transform.GetComponentInParent<Raycast>().enabled = !playerCamera.transform.GetComponentInParent<Raycast>().enabled;
         buildingCamera.enabled = !buildingCamera.enabled;
         buildingCamera.GetComponent<BuildingCamera>().MakeActive(pos);
+
+        // Panel Update
+        bInspectorPanel.SetActive(!bInspectorPanel.activeSelf);
     }
 
 
