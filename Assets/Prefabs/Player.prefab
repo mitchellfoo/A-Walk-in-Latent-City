@@ -575,7 +575,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Click to view in latent space
+  m_text: 'Click to change spaces
 
     Press V to add to selection'
   m_isRightToLeft: 0

@@ -199,8 +199,8 @@ public class FPSController : MonoBehaviour
         // Update HUD text
         /// Rounded to 1 decimal place
         float posX = Mathf.Round(transform.position.x * 10.0f) * 0.1f;
-        float posY = Mathf.Round(transform.position.z * 10.0f) * 0.1f;
-        float posZ = Mathf.Round(transform.position.y * 10.0f) * 0.1f;
+        float posY = Mathf.Round(transform.position.y * 10.0f) * 0.1f;
+        float posZ = Mathf.Round(transform.position.z * 10.0f) * 0.1f;
 
         positionOverlay.text = "X:" + posX + ", Y:" + posY + ", Z:" + posZ;
 
