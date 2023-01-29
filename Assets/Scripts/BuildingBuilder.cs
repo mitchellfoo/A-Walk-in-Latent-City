@@ -91,8 +91,8 @@ public class BuildingBuilder : MonoBehaviour
             else
             {
                 // Adjust Y in map view
-                // TODO: Adjust code to actually work
-                float yAdj = meshBounds.center.y - meshBounds.min.y / 2;
+                // TODO: Adjust code to actually work FIXED?!?
+                float yAdj = -meshBounds.min.y;
                 mesh.transform.position = new Vector3(mesh.transform.position.x, yAdj, mesh.transform.position.z);
             }
 
